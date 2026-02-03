@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .page { display: none; }
+        .page.active { display: block; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .breadcrumb-link { cursor: pointer; transition: color 0.3s; }
+        .breadcrumb-link:hover { color: #3B82F6; }
+        .card { transition: transform 0.3s, box-shadow 0.3s; }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .tab-button.active {
+            border-bottom-width: 2px;
+            border-color: #3B82F6;
+            color: #2563EB;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div id="app-container" class="container mx-auto p-4 sm:p-6 lg:p-8 max-w-7xl">
+
+        <!-- ================================================================= -->
+        <!-- LOGIN PAGE -->
+        <!-- ================================================================= -->
+        <div id="page-login" class="page active">
+            <div class="min-h-screen flex items-center justify-center -m-8">
+                <div class="max-w-md w-full bg-white p-8 rounded-xl shadow-lg">
+                    <h2 class="text-3xl font-bold text-center text-gray-900 mb-2">Welcome to Car Portal</h2>
+                    <p class="text-center text-gray-600 mb-8">Sign in to continue</p>
+                    <form id="login-form">
+                        <div class="space-y-6">
+                            <div>
+                                <label for="login-email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                                <input type="email" id="login-email" name="email" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="you@example.com">
+                            </div>
+                             <div>
+                                <label for="login-phone" class="block text-sm font-medium text-gray-700">Phone Number</label>
+                                <input type="tel" id="login-phone" name="phone" required class="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="9876543210">
+                            </div>
+                        </div>
+                        <div class="mt-8">
+                            <button type="submit" class="w-full inline-flex justify-center py-3 px-6 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                                Sign In
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================================================================= -->
+        <!-- CUSTOMER PORTAL -->
+        <!-- ================================================================= -->
+        <div id="portal-customer" class="page">
+            <header class="mb-6 flex justify-between items-center">
+                <div>
+                    <h1 class="text-4xl font-bold text-gray-900 mb-2">Customer Portal</h1>
+                    <p id="customer-welcome" class="text-lg text-gray-600"></p>
+                </div>
+                <button id="signout-btn-customer" class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 transition">Sign Out</button>
+            </header>
+
+            <div class="mb-6 border-b border-gray-200">
+                <nav class="flex space-x-4" aria-label="Tabs">
+                    <button id="customer-tab-book-car" class="tab-button text-gray-500 hover:text-gray-700 px-3 py-2 font-medium text-sm rounded-md">Book a Car</button>
+                    <button id="customer-tab-book-test-drive" class="tab-button text-gray-500 hover:text-gray-700 px-3 py-2 font-medium text-sm rounded-md">Book a Test Drive</button>
+                </nav>
+            </div>
+
+            <main id="customer-main-content">
+                <!-- Car Booking Flow -->
+                <div id="customer-content-book-car">
+                    <nav id="breadcrumb-customer" class="text-sm text-gray-500 mb-6 flex items-center space-x-2 bg-white p-3 rounded-lg shadow-sm"></nav>
+                    <div id="loader-customer" class="text-center my-10" style="display: none;">
+                        <svg class="animate-spin h-8 w-8 text-blue-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                        <p class="mt-2 text-gray-600">Loading...</p>
+                    </div>
+                    
+                    <div id="page-manufacturer" class="page fade-in"><h2 class="text-2xl font-semibold mb-4">1. Select a Manufacturer</h2><div id="manufacturer-list" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div></div>
+                    <div id="page-model" class="page fade-in"><h2 class="text-2xl font-semibold mb-4">2. Select a Car Model</h2><div id="model-list" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div></div>
+                    <div id="page-variant" class="page fade-in"><h2 class="text-2xl font-semibold mb-4">3. Select a Variant</h2><div id="variant-list" class="space-y-4"></div></div>
+                    <div id="page-inventory" class="page fade-in"><h2 class="text-2xl font-semibold mb-4">4. Available Cars in Dealerships</h2><div id="inventory-list" class="space-y-6"></div></div>
+                    
+                    <div id="page-booking" class="page fade-in">
+                        <h2 class="text-2xl font-semibold mb-4 text-gray-800">5. Confirm Your Booking</h2>
+                        <div class="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto">
+                            <h3 class="text-xl font-bold text-gray-900 mb-4 border-b pb-4">Booking Summary</h3>
+                            <div id="booking-car-details" class="mb-6 space-y-2"></div>
+                            <div id="booking-customer-details" class="mb-8 pt-6 border-t"></div>
+                            <div class="text-right">
+                                <button id="confirm-booking-btn" class="inline-flex justify-center py-3 px-6 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                                    Confirm & Book Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="page-confirmation" class="page fade-in text-center"><div class="bg-white p-10 rounded-lg shadow-lg max-w-lg mx-auto"><svg class="w-16 h-16 text-green-500 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg><h2 class="text-3xl font-bold text-gray-900 mb-2">Booking Successful!</h2><p class="text-gray-600 mb-6">Thank you. The dealership will contact you shortly.</p><div id="confirmation-details" class="text-left bg-gray-50 p-4 rounded-md border"></div><button onclick="resetAndGoHome(true)" class="mt-8 inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">Make Another Booking</button></div></div>
+                </div>
+                <div id="customer-content-book-test-drive" class="page">
+                    <h2 class="text-2xl font-bold mb-6">Book a Test Drive</h2>
+                    <div class="bg-white p-8 rounded-lg shadow-md max-w-2xl mx-auto"><form id="test-drive-form"><div class="space-y-6"><div><label for="td-manufacturer" class="block text-sm font-medium text-gray-700">1. Select Manufacturer</label><select id="td-manufacturer" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"></select></div><div><label for="td-model" class="block text-sm font-medium text-gray-700">2. Select Model</label><select id="td-model" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md" disabled></select></div><div><label for="td-variant" class="block text-sm font-medium text-gray-700">3. Select Variant</label><select id="td-variant" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md" disabled></select></div><div><label for="td-dealer" class="block text-sm font-medium text-gray-700">4. Select Dealership</label><select id="td-dealer" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md" disabled></select></div><div><label for="td-datetime" class="block text-sm font-medium text-gray-700">5. Preferred Date & Time</label><input type="datetime-local" id="td-datetime" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md" disabled></div></div><div class="mt-8 text-right"><button type="submit" class="inline-flex justify-center py-3 px-6 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">Request Test Drive</button></div></form></div>
+                     <div id="td-confirmation" class="hidden mt-8 text-center bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded-lg">Test drive booked successfully! The dealership will confirm your appointment.</div>
+                </div>
+            </main>
+        </div>
+
+        <!-- DEALER PORTAL -->
+        <div id="portal-dealer" class="page">
+             <header class="mb-6 flex justify-between items-center"><div><h1 class="text-4xl font-bold text-gray-900 mb-2">Dealer Portal</h1><p id="dealer-welcome" class="text-lg text-gray-600"></p></div><button id="signout-btn-dealer" class="bg-red-500 text-white font-semibold py-2 px-4 rounded-lg hover:bg-red-600 transition">Sign Out</button></header>
+             <div class="mb-6 border-b border-gray-200"><nav class="flex space-x-4" aria-label="Tabs"><button id="dealer-tab-inventory" class="tab-button text-gray-500 hover:text-gray-700 px-3 py-2 font-medium text-sm rounded-md">Inventory</button><button id="dealer-tab-sales" class="tab-button text-gray-500 hover:text-gray-700 px-3 py-2 font-medium text-sm rounded-md">Sales Records</button><button id="dealer-tab-test-drives" class="tab-button text-gray-500 hover:text-gray-700 px-3 py-2 font-medium text-sm rounded-md">Test Drives</button><button id="dealer-tab-analytics" class="tab-button text-gray-500 hover:text-gray-700 px-3 py-2 font-medium text-sm rounded-md">Analytics</button></nav></div>
+            <main id="dealer-main-content">
+                <div id="loader-dealer" class="text-center my-10" style="display: none;"><svg class="animate-spin h-8 w-8 text-blue-500 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><p class="mt-2 text-gray-600">Loading...</p></div>
+                <div id="dealer-content-inventory" class="page"></div>
+                <div id="dealer-content-sales" class="page"></div>
+                <div id="dealer-content-test-drives" class="page"></div>
+                <div id="dealer-content-analytics" class="page"><div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="bg-white p-6 rounded-lg shadow-md"><h3 class="text-xl font-semibold mb-4">Cars Sold by Manufacturer</h3><canvas id="salesByBrandChart"></canvas></div><div class="bg-white p-6 rounded-lg shadow-md"><h3 class="text-xl font-semibold mb-4">Cars Sold by Body Type</h3><canvas id="salesByBodyTypeChart"></canvas></div></div></div>
+            </main>
+        </div>
+
+        <!-- Error Message Box -->
+        <div id="error-box" class="fixed top-5 right-5 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg shadow-lg" role="alert" style="display: none; z-index: 100;"><strong class="font-bold">Error:</strong><span id="error-message" class="block sm:inline"></span></div>
+    </div>
+
+    <script>
+        // --- State Management ---
+        const API_BASE_URL = 'http://localhost:3001/api';
+        const BACKEND_ROOT_URL = 'http://localhost:3001'; 
+        let currentUser = null; 
+        let selection = {};
+        let brandChart, bodyTypeChart;
+
+        // --- DOM Elements ---
+        const allPages = document.querySelectorAll('.page');
+        const customerPages = document.querySelectorAll('#customer-main-content .page');
+        const dealerPages = document.querySelectorAll('#dealer-main-content .page');
+        const loginPage = document.getElementById('page-login');
+        const customerPortal = document.getElementById('portal-customer');
+        const dealerPortal = document.getElementById('portal-dealer');
+        
+        // --- Generic Helper Functions ---
+        const showLoader = (type) => document.getElementById(`loader-${type}`).style.display = 'block';
+        const hideLoader = (type) => document.getElementById(`loader-${type}`).style.display = 'none';
+
+        function showError(message) {
+            document.getElementById('error-message').textContent = message;
+            const errorBox = document.getElementById('error-box');
+            errorBox.style.display = 'block';
+            setTimeout(() => { errorBox.style.display = 'none'; }, 5000);
+        }
+
+        const debounce = (func, delay) => {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), delay);
+            };
+        };
+        
+        // --- Navigation Logic ---
+        function navigateToPortal(role) {
+            allPages.forEach(p => p.classList.remove('active'));
+            if (role === 'customer') {
+                customerPortal.classList.add('active');
+                switchCustomerTab('book-car');
+            } else if (role === 'dealer') {
+                dealerPortal.classList.add('active');
+                switchDealerTab('inventory');
+            } else {
+                loginPage.classList.add('active');
+            }
+        }
+        
+        function switchCustomerTab(tabId) {
+            document.querySelectorAll('#customer-main-content > div').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('#customer-main-content .page').forEach(el => el.classList.remove('active'));
+            document.getElementById(`customer-content-${tabId}`).style.display = 'block';
+            
+            if (tabId === 'book-car') {
+                resetAndGoHome(true);
+            } else if (tabId === 'book-test-drive') {
+                initTestDriveForm();
+            }
+
+            document.querySelectorAll('#portal-customer .tab-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`customer-tab-${tabId}`).classList.add('active');
+        }
+
+        function switchDealerTab(tabId) {
+            dealerPages.forEach(p => p.classList.remove('active'));
+            const contentEl = document.getElementById(`dealer-content-${tabId}`);
+            if (contentEl.querySelector('.table-container')) {
+                contentEl.querySelector('.table-container').innerHTML = '';
+            }
+            contentEl.classList.add('active');
+            
+            if(tabId === 'inventory') fetchDealerInventory();
+            if(tabId === 'sales') fetchDealerSales();
+            if(tabId === 'test-drives') fetchDealerTestDrives();
+            if(tabId === 'analytics') fetchAnalyticsData();
+
+            document.querySelectorAll('#portal-dealer .tab-button').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(`dealer-tab-${tabId}`).classList.add('active');
+        }
+
+        // --- Authentication ---
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.message);
+                
+                currentUser = { role: result.role, id: result.id, name: result.name };
+                
+                if (currentUser.role === 'customer') { document.getElementById('customer-welcome').textContent = `Welcome, ${currentUser.name}!`; } 
+                else if (currentUser.role === 'dealer') { document.getElementById('dealer-welcome').textContent = currentUser.name; }
+                
+                navigateToPortal(currentUser.role);
+            } catch (error) { showError(error.message || "Invalid credentials."); }
+        });
+
+        function signOut() { currentUser = null; navigateToPortal(null); }
+        document.getElementById('signout-btn-customer').addEventListener('click', signOut);
+        document.getElementById('signout-btn-dealer').addEventListener('click', signOut);
+
+        // --- Customer Portal: Car Booking ---
+        function goToCustomerPage(pageId) {
+            customerPages.forEach(page => page.classList.remove('active', 'fade-in'));
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if (targetPage) {
+                targetPage.classList.add('active');
+                setTimeout(() => targetPage.classList.add('fade-in'), 10);
+            }
+            updateBreadcrumb(pageId);
+        }
+
+        function updateBreadcrumb(currentPageId) {
+            const breadcrumb = document.getElementById('breadcrumb-customer');
+            breadcrumb.innerHTML = '';
+            const homeLink = document.createElement('span');
+            homeLink.textContent = 'Home';
+            homeLink.className = 'breadcrumb-link';
+            homeLink.onclick = () => resetAndGoHome(true);
+            breadcrumb.appendChild(homeLink);
+
+            if (selection.manufacturerName) {
+                breadcrumb.innerHTML += '<span class="mx-2">/</span>';
+                const manLink = document.createElement('span');
+                manLink.textContent = selection.manufacturerName;
+                if (currentPageId !== 'model' && currentPageId !== 'manufacturer') {
+                    manLink.className = 'breadcrumb-link';
+                    manLink.onclick = () => { resetSelection('model'); fetchModels(selection.manufacturerId); };
+                }
+                breadcrumb.appendChild(manLink);
+            }
+            if (selection.modelName) {
+                 breadcrumb.innerHTML += '<span class="mx-2">/</span>';
+                const modelLink = document.createElement('span');
+                modelLink.textContent = selection.modelName;
+                 if (currentPageId !== 'variant' && currentPageId !== 'model') {
+                    modelLink.className = 'breadcrumb-link';
+                    modelLink.onclick = () => { resetSelection('variant'); fetchVariants(selection.modelId); };
+                }
+                breadcrumb.appendChild(modelLink);
+            }
+        }
+        
+        async function fetchAndRender(endpoint, renderer, loaderType, ...args) {
+            showLoader(loaderType);
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`);
+                if (!response.ok) throw new Error(`Network response error`);
+                const data = await response.json();
+                renderer(data, ...args);
+            } catch (error) {
+                showError(`Could not load data. Ensure backend is running.`);
+            } finally {
+                hideLoader(loaderType);
+            }
+        }
+
+        const renderManufacturers = (manufacturers) => {
+            const list = document.getElementById('manufacturer-list');
+            list.innerHTML = '';
+            manufacturers.forEach(m => {
+                const item = document.createElement('div');
+                item.className = 'card bg-white p-4 rounded-lg shadow-md text-center cursor-pointer';
+                item.innerHTML = `<h3 class="font-semibold text-lg">${m.name}</h3>`;
+                item.onclick = () => { selection.manufacturerId = m.manufacturer_id; selection.manufacturerName = m.name; fetchModels(m.manufacturer_id); };
+                list.appendChild(item);
+            });
+        };
+        const fetchModels = (manId) => { fetchAndRender(`/models/${manId}`, renderModels, 'customer'); goToCustomerPage('model'); };
+        
+        const renderModels = (models) => {
+            const list = document.getElementById('model-list');
+            list.innerHTML = '';
+            if (!models || models.length === 0) { list.innerHTML = `<p class="text-gray-500 col-span-full text-center">No models found.</p>`; return; }
+            models.forEach(model => {
+                const item = document.createElement('div');
+                item.className = 'card bg-white rounded-lg shadow-md overflow-hidden cursor-pointer';
+                const imageUrl = model.image_url ? `${BACKEND_ROOT_URL}${model.image_url}` : `https://placehold.co/600x400/cccccc/4A5568?text=No+Image`;
+                item.innerHTML = `<img src="${imageUrl}" alt="${model.model_name}" class="w-full h-48 object-cover" onerror="this.onerror=null;this.src='https://placehold.co/600x400/cccccc/4A5568?text=Image+Error';"><div class="p-6"><h3 class="font-bold text-xl mb-2">${model.model_name}</h3><p class="text-gray-600 text-base">${model.body_type}</p></div>`;
+                item.onclick = () => { selection.modelId = model.model_id; selection.modelName = model.model_name; fetchVariants(model.model_id); };
+                list.appendChild(item);
+            });
+        };
+
+        const fetchVariants = (modelId) => { fetchAndRender(`/variants/${modelId}`, renderVariants, 'customer'); goToCustomerPage('variant'); };
+        const renderVariants = (variants) => {
+            const list = document.getElementById('variant-list');
+            list.innerHTML = '';
+             if (!variants || variants.length === 0) { list.innerHTML = `<p class="text-gray-500 text-center">No variants found.</p>`; return; }
+            variants.forEach(variant => {
+                const price = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(variant.ex_showroom_price);
+                const item = document.createElement('div');
+                item.className = 'card bg-white p-4 rounded-lg shadow-sm flex justify-between items-center cursor-pointer';
+                item.innerHTML = `<div><h3 class="font-semibold text-lg">${variant.variant_name}</h3><p class="text-sm text-gray-500">${variant.engine_type} | ${variant.transmission_type}</p><p class="font-bold text-blue-600 mt-1">${price}</p></div><svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>`;
+                item.onclick = () => { selection.variantId = variant.variant_id; selection.variantName = variant.variant_name; fetchInventory(variant.variant_id); };
+                list.appendChild(item);
+            });
+        };
+        const fetchInventory = (variantId) => { fetchAndRender(`/inventory/${variantId}`, renderInventory, 'customer'); goToCustomerPage('inventory'); };
+        const renderInventory = (inventory) => {
+            const list = document.getElementById('inventory-list');
+            list.innerHTML = '';
+            if (!inventory || inventory.length === 0) { list.innerHTML = `<div class="text-center bg-white p-8 rounded-lg shadow-md"><p class="text-lg text-gray-600">Sorry, this variant is currently out of stock.</p></div>`; return; }
+            inventory.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'card bg-white p-6 rounded-lg shadow-sm';
+                card.innerHTML = `<div class="flex flex-col sm:flex-row justify-between sm:items-center"><div><h3 class="font-bold text-xl">${item.dealer_name}</h3><p class="text-gray-600">${item.city}, ${item.state}</p><p class="text-sm text-gray-500 mt-1">Color: <span class="font-semibold">${item.color}</span></p></div><div class="mt-4 sm:mt-0"><button class="book-now-btn bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition" data-vin="${item.vin}">Book Now</button></div></div>`;
+                list.appendChild(card);
+            });
+            document.querySelectorAll('.book-now-btn').forEach(button => { button.onclick = (e) => prepareBooking(e.target.getAttribute('data-vin')); });
+        };
+        
+        async function prepareBooking(vin) {
+            showLoader('customer');
+            try {
+                const carResponse = await fetch(`${API_BASE_URL}/inventory/car/${vin}`);
+                if(!carResponse.ok) throw new Error('Car details not found');
+                const carDetails = await carResponse.json();
+                
+                const customerResponse = await fetch(`${API_BASE_URL}/customers/${currentUser.id}`);
+                if(!customerResponse.ok) throw new Error('Could not fetch your details.');
+                const customerDetails = await customerResponse.json();
+
+                selection.inventoryVin = vin;
+
+                const carDetailsDiv = document.getElementById('booking-car-details');
+                const customerDetailsDiv = document.getElementById('booking-customer-details');
+                
+                const exShowroomPrice = carDetails.ex_showroom_price;
+                const onRoadPrice = Math.round(exShowroomPrice * 1.18);
+
+                carDetailsDiv.innerHTML = `
+                    <h4 class="text-lg font-semibold text-gray-800 mb-2">Car Details:</h4>
+                    <p><strong>Car:</strong> ${carDetails.model_name} ${carDetails.variant_name}</p>
+                    <p><strong>Dealer:</strong> ${carDetails.dealer_name}, ${carDetails.city}</p>
+                    <p><strong>Color:</strong> ${carDetails.color}</p>
+                    <p><strong>Ex-Showroom Price:</strong> ${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(exShowroomPrice)}</p>
+                    <p class="font-bold text-blue-600 mt-1">Estimated On-Road Price: ${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(onRoadPrice)}</p>
+                `;
+                
+                customerDetailsDiv.innerHTML = `
+                    <h4 class="text-lg font-semibold text-gray-800 mb-2">Your Details:</h4>
+                    <p><strong>Name:</strong> ${customerDetails.first_name} ${customerDetails.last_name}</p>
+                    <p><strong>Email:</strong> ${customerDetails.email}</p>
+                    <p><strong>Phone:</strong> ${customerDetails.phone_number}</p>
+                `;
+
+                goToCustomerPage('booking');
+            } catch(error) { 
+                console.error("Error preparing booking:", error);
+                showError(error.message || "Could not retrieve details for booking."); 
+            } finally { 
+                hideLoader('customer'); 
+            }
+        }
+        
+        document.getElementById('confirm-booking-btn').addEventListener('click', async () => {
+            showLoader('customer');
+            try {
+                const bookingResponse = await fetch(`${API_BASE_URL}/book`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' }, 
+                    body: JSON.stringify({ vin: selection.inventoryVin, customerId: currentUser.id }) 
+                });
+                if(!bookingResponse.ok) {
+                    const err = await bookingResponse.json();
+                    throw new Error(err.message || 'Failed to complete booking');
+                }
+                const bookingDetails = await bookingResponse.json();
+                renderConfirmation(bookingDetails);
+                goToCustomerPage('confirmation');
+            } catch (error) { 
+                showError(error.message); 
+            } 
+            finally { hideLoader('customer'); }
+        });
+        
+        function renderConfirmation(details) {
+            const confirmationDiv = document.getElementById('confirmation-details');
+            const price = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(details.final_on_road_price);
+            confirmationDiv.innerHTML = `<p><strong>Booking ID:</strong> ${details.sale_id}</p><p><strong>Car:</strong> ${details.model_name} ${details.variant_name}</p><p><strong>VIN:</strong> ${details.vin}</p><p><strong>Dealer:</strong> ${details.dealer_name}</p><p class="font-bold mt-2">Final On-Road Price Payable: ${price}</p>`;
+        }
+        
+        function resetSelection(level) {
+            if (!level || level === 'manufacturer') { selection = {}; }
+            if (level === 'model') { selection.modelId = null; selection.modelName = null; }
+            if (level === 'variant') { selection.variantId = null; selection.variantName = null; }
+        }
+        function resetAndGoHome(isCustomer) {
+            resetSelection();
+            if(isCustomer) {
+                fetchAndRender('/manufacturers', renderManufacturers, 'customer');
+                goToCustomerPage('manufacturer');
+            }
+        }
+        
+        async function initTestDriveForm() {
+            const manSelect = document.getElementById('td-manufacturer');
+            const modelSelect = document.getElementById('td-model');
+            const variantSelect = document.getElementById('td-variant');
+            const dealerSelect = document.getElementById('td-dealer');
+            const datetimeInput = document.getElementById('td-datetime');
+            manSelect.innerHTML = '<option>Loading manufacturers...</option>';
+            [modelSelect, variantSelect, dealerSelect, datetimeInput].forEach(el => { el.innerHTML = ''; el.disabled = true; });
+
+            const response = await fetch(`${API_BASE_URL}/manufacturers`);
+            const manufacturers = await response.json();
+            manSelect.innerHTML = '<option value="">Select a Manufacturer</option>';
+            manufacturers.forEach(m => manSelect.innerHTML += `<option value="${m.manufacturer_id}">${m.name}</option>`);
+
+            manSelect.onchange = async () => {
+                modelSelect.disabled = true; modelSelect.innerHTML = '<option>Loading...</option>';
+                const manId = manSelect.value; if (!manId) return;
+                const res = await fetch(`${API_BASE_URL}/models/${manId}`); const models = await res.json();
+                modelSelect.innerHTML = '<option value="">Select a Model</option>';
+                models.forEach(m => modelSelect.innerHTML += `<option value="${m.model_id}">${m.model_name}</option>`);
+                modelSelect.disabled = false;
+            };
+            modelSelect.onchange = async () => {
+                variantSelect.disabled = true; variantSelect.innerHTML = '<option>Loading...</option>';
+                const modelId = modelSelect.value; if (!modelId) return;
+                const res = await fetch(`${API_BASE_URL}/variants/${modelId}`); const variants = await res.json();
+                variantSelect.innerHTML = '<option value="">Select a Variant</option>';
+                variants.forEach(v => variantSelect.innerHTML += `<option value="${v.variant_id}">${v.variant_name}</option>`);
+                variantSelect.disabled = false;
+            };
+            variantSelect.onchange = async () => {
+                dealerSelect.disabled = true; dealerSelect.innerHTML = '<option>Loading...</option>';
+                const res = await fetch(`${API_BASE_URL}/dealers`); const dealers = await res.json();
+                dealerSelect.innerHTML = '<option value="">Select a Dealer</option>';
+                dealers.forEach(d => dealerSelect.innerHTML += `<option value="${d.dealer_id}">${d.dealer_name} - ${d.city}</option>`);
+                dealerSelect.disabled = false;
+            };
+            dealerSelect.onchange = () => datetimeInput.disabled = !dealerSelect.value;
+        }
+
+        document.getElementById('test-drive-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const data = { customerId: currentUser.id, dealerId: document.getElementById('td-dealer').value, variantId: document.getElementById('td-variant').value, driveDateTime: document.getElementById('td-datetime').value };
+            if(!data.dealerId || !data.variantId || !data.driveDateTime) { showError("Please fill out all fields."); return; }
+            try {
+                const response = await fetch(`${API_BASE_URL}/test-drives`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+                if(!response.ok) throw new Error('Failed to book test drive.');
+                document.getElementById('td-confirmation').style.display = 'block';
+                e.target.reset();
+                 setTimeout(() => { document.getElementById('td-confirmation').style.display = 'none'; }, 5000);
+            } catch(error) { showError(error.message); }
+        });
+
+        const fetchDealerInventory = (searchTerm = '') => fetchAndRender(`/dealer/${currentUser.id}/inventory?search=${searchTerm}`, renderDealerInventory, 'dealer');
+        const fetchDealerSales = (searchTerm = '') => fetchAndRender(`/dealer/${currentUser.id}/sales?search=${searchTerm}`, renderDealerSales, 'dealer');
+        const fetchDealerTestDrives = (searchTerm = '') => fetchAndRender(`/dealer/${currentUser.id}/test-drives?search=${searchTerm}`, renderDealerTestDrives, 'dealer');
+        const fetchAnalyticsData = async () => {
+            showLoader('dealer');
+            try {
+                const [brandRes, bodyTypeRes] = await Promise.all([ fetch(`${API_BASE_URL}/analytics/sales-by-brand`), fetch(`${API_BASE_URL}/analytics/sales-by-body-type`) ]);
+                const brandData = await brandRes.json();
+                const bodyTypeData = await bodyTypeRes.json();
+                renderSalesByBrandChart(brandData);
+                renderSalesByBodyTypeChart(bodyTypeData);
+            } catch (error) { showError('Could not load analytics charts.'); }
+            finally { hideLoader('dealer'); }
+        };
+
+        function renderSalesByBrandChart(data) {
+            const ctx = document.getElementById('salesByBrandChart').getContext('2d');
+            if(brandChart) brandChart.destroy();
+            brandChart = new Chart(ctx, { type: 'bar', data: { labels: data.map(d => d.name), datasets: [{ label: '# of Cars Sold', data: data.map(d => d.sales_count), backgroundColor: 'rgba(59, 130, 246, 0.7)', borderColor: 'rgba(59, 130, 246, 1)', borderWidth: 1 }] }, options: { scales: { y: { beginAtZero: true, ticks: { precision: 0 }, max: 50 } }, responsive: true } });
+        }
+        function renderSalesByBodyTypeChart(data) {
+             const ctx = document.getElementById('salesByBodyTypeChart').getContext('2d');
+             if(bodyTypeChart) bodyTypeChart.destroy();
+             bodyTypeChart = new Chart(ctx, { type: 'pie', data: { labels: data.map(d => d.body_type), datasets: [{ label: 'Sales by Body Type', data: data.map(d => d.sales_count), backgroundColor: [ 'rgba(255, 99, 132, 0.7)', 'rgba(54, 162, 235, 0.7)', 'rgba(255, 206, 86, 0.7)', 'rgba(75, 192, 192, 0.7)', 'rgba(153, 102, 255, 0.7)', 'rgba(255, 159, 64, 0.7)' ], hoverOffset: 4 }] }, options: { responsive: true, plugins: { legend: { position: 'top' } } } });
+        }
+        
+        function renderDealerInventory(data) {
+            const container = document.getElementById('dealer-content-inventory');
+            container.innerHTML = `<div class="mb-4"><input type="search" id="inventory-search" placeholder="Search by VIN, model, color, status..." class="w-full px-4 py-2 border rounded-md"></div><div class="table-container"></div>`;
+            const tableContainer = container.querySelector('.table-container');
+            if (data.length === 0) { tableContainer.innerHTML = `<p>No inventory found.</p>`; return; }
+            const table = `<div class="overflow-x-auto bg-white rounded-lg shadow"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">VIN</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Car</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Color</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Arrival Date</th></tr></thead><tbody class="bg-white divide-y divide-gray-200">${data.map(item => `<tr><td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500">${item.vin}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.model_name} ${item.variant_name}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.color}</td><td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.status === 'In Stock' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">${item.status}</span></td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(item.arrival_date).toLocaleDateString()}</td></tr>`).join('')}</tbody></table></div>`;
+            tableContainer.innerHTML = table;
+        }
+        function renderDealerSales(data) {
+            const container = document.getElementById('dealer-content-sales');
+            container.innerHTML = `<div class="mb-4"><input type="search" id="sales-search" placeholder="Search by customer, model, VIN..." class="w-full px-4 py-2 border rounded-md"></div><div class="table-container"></div>`;
+            const tableContainer = container.querySelector('.table-container');
+            if (data.length === 0) { tableContainer.innerHTML = `<p>No sales records found.</p>`; return; }
+            const table = `<div class="overflow-x-auto bg-white rounded-lg shadow"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Sale ID</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Car</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Final Price</th></tr></thead><tbody class="bg-white divide-y divide-gray-200">${data.map(item => `<tr><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.sale_id}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(item.sale_date).toLocaleDateString()}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.model_name} ${item.variant_name}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.first_name} ${item.last_name}</td><td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">${new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', minimumFractionDigits: 0 }).format(item.final_on_road_price)}</td></tr>`).join('')}</tbody></table></div>`;
+            tableContainer.innerHTML = table;
+        }
+        function renderDealerTestDrives(data) {
+            const container = document.getElementById('dealer-content-test-drives');
+            container.innerHTML = `<div class="mb-4"><input type="search" id="test-drives-search" placeholder="Search by customer, model, status..." class="w-full px-4 py-2 border rounded-md"></div><div class="table-container"></div>`;
+            const tableContainer = container.querySelector('.table-container');
+            if (data.length === 0) { tableContainer.innerHTML = `<p>No test drives found.</p>`; return; }
+            const table = `<div class="overflow-x-auto bg-white rounded-lg shadow"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date & Time</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Car</th><th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th></tr></thead><tbody class="bg-white divide-y divide-gray-200">${data.map(item => `<tr><td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${new Date(item.drive_date_time).toLocaleString()}</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.first_name} ${item.last_name} (${item.phone_number})</td><td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.model_name} ${item.variant_name}</td><td class="px-6 py-4 whitespace-nowrap"><span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.status === 'Completed' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}">${item.status}</span></td></tr>`).join('')}</tbody></table></div>`;
+            tableContainer.innerHTML = table;
+        }
+
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('customer-tab-book-car').addEventListener('click', () => switchCustomerTab('book-car'));
+            document.getElementById('customer-tab-book-test-drive').addEventListener('click', () => switchCustomerTab('book-test-drive'));
+            document.getElementById('dealer-tab-inventory').addEventListener('click', () => switchDealerTab('inventory'));
+            document.getElementById('dealer-tab-sales').addEventListener('click', () => switchDealerTab('sales'));
+            document.getElementById('dealer-tab-test-drives').addEventListener('click', () => switchDealerTab('test-drives'));
+            document.getElementById('dealer-tab-analytics').addEventListener('click', () => switchDealerTab('analytics'));
+
+            const debouncedInventorySearch = debounce((e) => fetchDealerInventory(e.target.value), 300);
+            const debouncedSalesSearch = debounce((e) => fetchDealerSales(e.target.value), 300);
+            const debouncedTestDrivesSearch = debounce((e) => fetchDealerTestDrives(e.target.value), 300);
+
+            document.body.addEventListener('input', (e) => {
+                if (e.target.id === 'inventory-search') debouncedInventorySearch(e);
+                if (e.target.id === 'sales-search') debouncedSalesSearch(e);
+                if (e.target.id === 'test-drives-search') debouncedTestDrivesSearch(e);
+            });
+        });
+    </script>
+</body>
+</html>
+
