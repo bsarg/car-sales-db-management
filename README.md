@@ -1,46 +1,174 @@
-Car Sales and Inventory Management System
+# DBMS Project - Car Dealer Management System
 
 [Click here to read the documentation](car_sales_report.pdf)
 
-A centralized, full-stack DBMS designed to bridge the information gap in the Indian automobile market. This application provides a unified platform for Customers to book vehicles and for Dealers to manage real-time inventory and sales analytics.
+A full-stack web application for managing car dealerships and customer interactions, built with Node.js, Express, SQLite, and vanilla HTML/CSS/JavaScript.
 
-Key Features
+## Project Overview
 
-+ Role-Based Portals: Secure login system that dynamically redirects users to either a Customer or Dealer dashboard based on credentials.
+This project implements a **Database Management System (DBMS)** for a car dealership platform that supports two types of users:
+- **Dealers**: Can manage vehicle inventory and customer interactions
+- **Customers**: Can browse available cars and manage their orders
 
-+ Guided Booking Flow: A multi-step interface for customers to select manufacturers, models, and variants with real-time "In Stock" verification.
+## Tech Stack
 
-+ Live Inventory Search: Powerful dealer tools for filtering sales, test drives, and stock by VIN or model in real-time.
+### Backend
+- **Runtime**: Node.js
+- **Framework**: Express.js (v5.1.0)
+- **Database**: SQLite3 (v5.1.7)
+- **Middleware**: CORS (v2.8.5)
 
-+ Sales Analytics: Interactive data visualization using Chart.js to track market leaders by manufacturer and body type.
+### Frontend
+- **HTML5**
+- **CSS3**
+- **Vanilla JavaScript**
 
-Tech Stack:
+## Project Structure
 
-+ Frontend: HTML5, Tailwind CSS, Vanilla JavaScript (Single-Page Application experience).
+```
+dbms_project/
+├── backend/
+│   ├── server.js              # Express server and API endpoints
+│   ├── cars.db                # SQLite database file
+│   ├── SQLite.sql             # Database schema
+│   ├── SQLite1.sql            # Additional database configurations
+│   └── public/
+│       └── images/            # Static images for the frontend
+├── frontend/
+│   └── index.html             # Main frontend application
+├── package.json               # Project dependencies
+└── README.md                  # This file
+```
 
-+ Backend: Node.js with Express.js (RESTful API with 15+ endpoints).
+## Features
 
-+ Database: SQLite (Relational model with 8 core tables ensuring data integrity).
+### Authentication
+- User login with email and phone number verification
+- Role-based authentication (Dealer/Customer)
+- Secure credential validation against database
 
-+ Visualization: Chart.js.
+### API Endpoints
+- `/api/login` - User authentication endpoint
+- Additional endpoints for car and dealer management (to be documented)
 
-Technical Challenges & Solutions
-1. State Management & Asynchronous UI
-To prevent the UI from freezing during data retrieval, I utilized the Fetch API for asynchronous calls and implemented global State Management to personalize the user portal without full page reloads.
+### Database
+- **Dealer Table**: Stores dealer information including name, email, and contact details
+- **Customer Table**: Stores customer information including name, email, and phone number
+- **Additional Tables**: For cars, orders, and transactions (see SQL schema files)
 
-2. Relational Integrity
-I designed a schema that enforces strict business rules: a vehicle (VIN) cannot be sold twice, and bookings can only be made from active "In Stock" inventory.
+## Installation
 
-3. Complex Search Filtering
-Developed dynamic search endpoints that build complex SQL queries using JOIN and LIKE operators to filter results across multiple related tables simultaneously.
+### Prerequisites
+- Node.js (v14 or higher)
+- npm (v6 or higher)
 
-System Architecture
+### Setup Instructions
 
-The system follows a 3-Tier Architecture:
+1. **Clone or navigate to the project directory**:
+   ```bash
+   cd dbms_project
+   ```
 
-+ Database: Structured relational data storage.
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
 
-+ Backend: Logic execution and data serving via REST API.
+3. **Start the server**:
+   ```bash
+   node backend/server.js
+   ```
+   
+   The server will start on `http://localhost:3001`
 
-+ Frontend Client: Dynamic rendering of HTML based on JSON data.
+4. **Access the frontend**:
+   Open your browser and navigate to `http://localhost:3001`
+
+## Usage
+
+### For Dealers
+1. Log in with your registered email and phone number
+2. Access your dealer dashboard
+3. Manage vehicle inventory
+4. View and manage customer inquiries
+
+### For Customers
+1. Log in with your registered email and phone number
+2. Browse available vehicles
+3. Place orders or inquiries
+4. Track your order status
+
+## Database Setup
+
+The SQLite database (`cars.db`) is initialized with schema defined in the SQL files:
+- `SQLite.sql` - Primary schema
+- `SQLite1.sql` - Additional configurations
+
+To reinitialize the database, run the SQL schema files against the SQLite database.
+
+## API Documentation
+
+### Authentication Endpoint
+
+**POST** `/api/login`
+
+Request body:
+```json
+{
+  "email": "user@example.com",
+  "phone": "123-456-7890"
+}
+```
+
+Response (Dealer):
+```json
+{
+  "role": "dealer",
+  "id": 1,
+  "name": "John's Auto Dealership"
+}
+```
+
+Response (Customer):
+```json
+{
+  "role": "customer",
+  "id": 1,
+  "name": "Jane Doe"
+}
+```
+
+## Troubleshooting
+
+### Database Connection Issues
+- Ensure the SQLite database file (`cars.db`) exists in the `backend/` directory
+- Check file permissions
+- Verify the database path in `server.js`
+
+### Port Already in Use
+- Change the `port` variable in `server.js` if port 3001 is already in use
+- Ensure no other service is running on port 3001
+
+### CORS Issues
+- Verify CORS is properly configured for your frontend domain
+- Check the CORS middleware in `server.js`
+
+## Future Enhancements
+
+- Add comprehensive error handling and logging
+- Implement JWT authentication for enhanced security
+- Add more API endpoints for CRUD operations
+- Implement pagination for large datasets
+- Add input validation and sanitization
+- Create comprehensive API documentation (Swagger/OpenAPI)
+- Add unit and integration tests
+
+## License
+
+This project is part of a database management systems course/assignment.
+
+## Contact
+
+For questions or issues related to this project, please refer to the project documentation or contact the development team.
+
 
