@@ -1,33 +1,13 @@
--- SQLite
--- =================================================================
--- MASTER DATA INSERTION SCRIPT (Corrected Logic & Expanded Inventory)
--- This single script populates all tables in the correct order.
--- It can be run multiple times; it will clear old transactional data first.
--- =================================================================
 
--- =================================================================
--- Section 0: Data Cleanup (Makes the script re-runnable)
--- =================================================================
+
+
 DELETE FROM Test_Drive;
 DELETE FROM Sale;
 DELETE FROM Inventory;
 DELETE FROM Customer;
 DELETE FROM Dealer;
--- We do not delete from Car_Variant, Car_Model, or Manufacturer
--- as they contain the core, static data. If you need to reset them,
--- you should run the table creation script again.
 
--- =================================================================
--- Section 1: Car Variants (Assuming this is already populated)
--- NOTE: The INSERT statements for Car_Variant are extensive.
--- To keep this file focused, we'll assume they have been run from the previous steps.
--- If starting from a blank DB, run the variant INSERTs first.
--- =================================================================
-
-
--- =================================================================
 -- Section 2: Dealers, Customers, and Transactions
--- =================================================================
 
 -- Dealer Data
 INSERT INTO Dealer (dealer_name, address, city, state, pincode, contact_number, email) VALUES
