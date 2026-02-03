@@ -1,6 +1,6 @@
 Car Sales and Inventory Management System
 
-[Click here to read the documentation](docs/car_sales_project_report.pdf)
+[Click here to read the documentation](car_sales_report.pdf)
 
 A centralized, full-stack DBMS designed to bridge the information gap in the Indian automobile market. This application provides a unified platform for Customers to book vehicles and for Dealers to manage real-time inventory and sales analytics.
 
